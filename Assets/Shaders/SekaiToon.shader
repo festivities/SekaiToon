@@ -27,7 +27,7 @@ Shader ".festivity/SekaiToon/SekaiToon-main"{
     SubShader{
         Tags{
             "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "Queue" = "Geometry+70"
         }
 
         HLSLINCLUDE
@@ -37,7 +37,6 @@ Shader ".festivity/SekaiToon/SekaiToon-main"{
 
         #pragma multi_compile _ UNITY_HDR_ON
         #pragma multi_compile_fog
-        #pragma multi_compile_fwdbase
         #pragma skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED
 
         #include "UnityCG.cginc"
@@ -87,6 +86,8 @@ Shader ".festivity/SekaiToon/SekaiToon-main"{
 
             HLSLPROGRAM
 
+            #pragma multi_compile_fwdbase
+
             #include "SekaiToon-main.hlsl"
 
             ENDHLSL
@@ -98,10 +99,12 @@ Shader ".festivity/SekaiToon/SekaiToon-main"{
 
             HLSLPROGRAM
 
+            #pragma multi_compile_fwdbase
+
             #include "SekaiToon-outlines.hlsl"
 
             ENDHLSL
         }
+        UsePass "Standard/SHADOWCASTER"
     }
-    Fallback "Standard"
 }

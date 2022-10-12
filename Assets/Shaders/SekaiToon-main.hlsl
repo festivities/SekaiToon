@@ -26,6 +26,13 @@ vsOut vert(vsIn i){
     o.vertexcol.w = i.vertexcol.w; // UNUSED
 
     const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertex)); // transform to world space
+    const vector<half, 3> viewDirOS = normalize(ObjSpaceViewDir(o.vertexOS));
+
+    vector<half, 4> zOffset = 1.0;
+    zOffset.xyz = o.vertexcol.z * 0.015 * viewDirOS;
+    zOffset.xyz += o.vertexOS;
+
+    o.pos = mul(UNITY_MATRIX_MVP, zOffset);
 
     // compute vertex lights
     o.vertexLight = ComputeAdditionalLights(vertexWS, o.pos);
@@ -45,7 +52,7 @@ vsOut vert(vsIn i){
 vector<float, 4> frag(vsOut i) : SV_Target{
     const vector<half, 3> normalWS = UnityObjectToWorldNormal(i.normalOS);
     const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertexOS));
-    const vector<half, 3> viewDir = normalize(WorldSpaceViewDir(i.vertexOS));
+    const vector<half, 3> viewDirWS = normalize(WorldSpaceViewDir(i.vertexOS));
 
 
     /* TEXTURE CREATION */
@@ -72,13 +79,13 @@ vector<float, 4> frag(vsOut i) : SV_Target{
     // control shadow push
 
     // NdotV, probably not needed
-    half NdotV = dot(viewDir, normalWS);
+    half NdotV = dot(viewDirWS, normalWS);
     // convert from a range of { -1, 1 } to { 0, 1 }
     //NdotV = NdotV * 0.5 + 0.5;
 
     // NdotH, probably not needed
     // form the halfVector
-    vector<half, 3> halfVector = normalize(viewDir + i.lightData.lightDirection);
+    vector<half, 3> halfVector = normalize(viewDirWS + i.lightData.lightDirection);
     half NdotH = dot(halfVector, normalWS);
 
     // shadows

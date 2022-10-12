@@ -59,11 +59,11 @@ vsOut vert(vsIn i){
         }
 
         // get camera view direction
-        vector<half, 3> viewDir = normalize(_WorldSpaceCameraPos - vertexWS);
+        vector<half, 3> viewDirWS = normalize(_WorldSpaceCameraPos - vertexWS);
 
         vViewPosition = vector<half, 4>(scale.xyz, 0);
         vViewPosition.xyz = vViewPosition.xyz * outlineDirection.xyz * fovScale;
-        vViewPosition = vViewPosition - mul(unity_WorldToObject, viewDir) * zOffset;
+        vViewPosition = vViewPosition - mul(unity_WorldToObject, viewDirWS) * zOffset;
         vViewPosition += o.vertexOS;
         // convert to clip space
         vViewPosition = mul(UNITY_MATRIX_MVP, vViewPosition);
