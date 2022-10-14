@@ -1,14 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  SekaiToon [Project Sekai shader for Unity (Built-in Rendering Pipeline)]
-//
-//  Originally for MMD by: KH40 (khoast40) - https://github.com/KH40-khoast40/Shadekai/
-//  Fork by: festivity - https://github.com/festivize/SekaiToon/
-//  Base shader: 舞力介入P
-//  Special thanks: Yukikami, lilxyzw
-//
-////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "SekaiToon-inputs.hlsli"
 
 #include "SekaiToon-helpers.hlsl"
@@ -19,7 +8,7 @@ vsOut vert(vsIn i){
     o.normalOS = i.normal;
     o.tangent = i.tangent;
     o.vertexOS = i.vertex;
-    o.uv = i.uv;
+    o.uv = (_ToggleLongTex != 0) ? vector<float, 2>(i.uv.x * 0.5, i.uv.y) : i.uv; // vs_TEXCOORD1
     o.vertexcol.x = i.vertexcol.x; // outline direction, EdgeScale_view @ line 246
     o.vertexcol.y = i.vertexcol.y; // rim intensity, RimScale_view @ line 247
     o.vertexcol.z = i.vertexcol.z; // eyebrow mask, used for making them appear in front of the hair at all times
@@ -52,13 +41,13 @@ vsOut vert(vsIn i){
 vector<float, 4> frag(vsOut i) : SV_Target{
     const vector<half, 3> normalWS = UnityObjectToWorldNormal(i.normalOS);
     const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertexOS));
-    const vector<half, 3> viewDirWS = normalize(WorldSpaceViewDir(i.vertexOS));
+    const vector<half, 3> viewDirWS = normalize(WorldSpaceViewDir(i.vertexOS)); // vs_TEXCOORD2?
 
 
     /* TEXTURE CREATION */
 
-    const vector<fixed, 4> diffuseTex = _DiffuseTex.Sample(sampler_DiffuseTex, i.uv);
-    const vector<fixed, 4> lightmapTex = _LightmapTex.Sample(sampler_LightmapTex, i.uv);
+    const vector<fixed, 4> mainTex = _MainTex.Sample(sampler_MainTex, i.uv);
+    const vector<fixed, 4> valueTex = _ValueTex.Sample(sampler_ValueTex, i.uv);
     const vector<fixed, 4> shadowTex = _ShadowTex.Sample(sampler_ShadowTex, i.uv);
 
     /* END OF TEXTURE CREATION */
@@ -74,9 +63,10 @@ vector<float, 4> frag(vsOut i) : SV_Target{
     NdotL = NdotL * 0.5 + 0.5;
     // control shadow push
     NdotL += _ShadowPush;
-    // control shadow smoothness
-    NdotL = smoothstep(0.0 + (1.0 - _ShadowSmoothness) * 0.5, 1.0 - (1.0 - _ShadowSmoothness) * 0.5, NdotL);
-    // control shadow push
+    // use blue channel of lightmap texture
+    NdotL = saturate(NdotL + (valueTex.z * 2.0 - 1.0));
+    // control shadow smoothness, 0.0925 is arbitrary - I wanted to visually match line 217
+    NdotL = smoothstep(0.0 + (1.0 - _ShadowSmoothness) * 0.5, 1.0 - (1.0 - _ShadowSmoothness) * 0.5, NdotL + 0.0925);
 
     // NdotV, probably not needed
     half NdotV = dot(viewDirWS, normalWS);
@@ -90,20 +80,21 @@ vector<float, 4> frag(vsOut i) : SV_Target{
 
     // shadows
     UNITY_LIGHT_ATTENUATION(attenuation, i, vertexWS);
-    if(_ReceiveShadows != 0){ NdotL *= attenuation; }
+    NdotL *= lerp(1.0, attenuation, _ShadowStrength);
 
     /* END OF DOT CREATION */
 
 
     /* RAMP CREATION */
 
-    // diffuse ramp
-    vector<fixed, 3> diffuseRamp = lerp(shadowTex, diffuseTex, NdotL);
-    
-    vector<fixed, 3> colorSkin = diffuseRamp * (Skin_Color[_Character - 1.0] / 255.0);
-    colorSkin = max(colorSkin, (SkinShade_Color[_Character - 1.0] / 255.0));
-
-    diffuseRamp = lerp(diffuseRamp, colorSkin, lightmapTex.x);
+    // diffuse ramp, lines 218-221
+    vector<fixed, 3> diffuseRamp = lerp(shadowTex, mainTex, NdotL);
+    // apply _Shadow1SkinColor, lines 222-224
+    vector<fixed, 3> skinColor = lerp(Shadow1SkinColor[_CharacterId - 1.0], DefaultSkinColor[_CharacterId - 1.0], saturate(diffuseRamp.x * 2.0 - 1.0));
+    // apply _Shadow1SkinColor, lines 225
+    skinColor = lerp(Shadow2SkinColor[_CharacterId - 1.0], skinColor, saturate(diffuseRamp.x + diffuseRamp.x));
+    // apply skinColor
+    diffuseRamp = lerp(diffuseRamp, skinColor, valueTex.x >= 0.5);
 
     // rim light ramp
     half rim = pow(saturate(buffer), _RimLength);
@@ -122,9 +113,12 @@ vector<float, 4> frag(vsOut i) : SV_Target{
 
     /* DEBUGGING */
 
-    if(_ReturnVertexColorR != 0){ return vector<fixed, 4>(i.vertexcol.x, 0.0, 0.0, 1.0); }
-    if(_ReturnVertexColorG != 0){ return vector<fixed, 4>(0.0, i.vertexcol.y, 0.0, 1.0); }
-    if(_ReturnVertexColorB != 0){ return vector<fixed, 4>(0.0, 0.0, i.vertexcol.z, 1.0); }
+    if(_ReturnLightmapR != 0){ return vector<fixed, 4>(valueTex.xxx, 1.0); }
+    if(_ReturnLightmapG != 0){ return vector<fixed, 4>(valueTex.yyy, 1.0); }
+    if(_ReturnLightmapB != 0){ return vector<fixed, 4>(valueTex.zzz, 1.0); }
+    if(_ReturnVertexColorR != 0){ return vector<fixed, 4>(i.vertexcol.xxx, 1.0); }
+    if(_ReturnVertexColorG != 0){ return vector<fixed, 4>(i.vertexcol.yyy, 1.0); }
+    if(_ReturnVertexColorB != 0){ return vector<fixed, 4>(i.vertexcol.zzz, 1.0); }
     if(_ReturnNormals != 0){ return vector<fixed, 4>(i.normalOS, 1.0); }
     if(_ReturnTangents != 0){ return i.tangent; }
 

@@ -2,64 +2,88 @@
 #define SEKAITOON_HELPERS
 
 //------------------------------------------------------------------------------- 
-/* https://github.com/KH40-khoast40/Shadekai/blob/main/Shadekai_Database.fxsub */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	0.Ichika	4.Minori	8.Kohane	12.Tsukasa	16.Kanade	20.Vocaloids
-//	1.Saki		5.Haruka	9.An		13.Emu		17.Mafuyu
-//	2.Honami	6.Airi		10.Akito	14.Nene		18.Ena
-//	3.Shiho		7.Shizuku	11.Touya	15.Rui		19.Mizuki
+//	1.Ichika	5.Minori	9.Kohane	13.Tsukasa	17.Kanade	21.Vocaloids
+//	2.Saki		6.Haruka	10.An		14.Emu		18.Mafuyu
+//	3.Honami	7.Airi		11.Akito	15.Nene		19.Ena
+//	4.Shiho		8.Shizuku	12.Touya	16.Rui		20.Mizuki
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// skin colors, I have literally no idea as to why this needs to be static
-const static vector<float, 3> Skin_Color[21] = {
-	vector<float, 3>(255, 245, 232),	//Ichika//     1
-	vector<float, 3>(255, 245, 232),	//Saki//       2
-	vector<float, 3>(255, 245, 232),	//Honami//     3
-	vector<float, 3>(255, 245, 232),	//Shiho//      4
-	vector<float, 3>(254, 239, 224),	//Minori//     5
-	vector<float, 3>(255, 245, 232),	//Haruka//     6
-	vector<float, 3>(254, 239, 224),	//Airi//       7
-	vector<float, 3>(255, 245, 232),	//Shizuku//    8
-	vector<float, 3>(255, 245, 232),	//Kohane//     9
-	vector<float, 3>(254, 239, 224),	//An//         10
-	vector<float, 3>(254, 239, 224),	//Akito//      11
-	vector<float, 3>(255, 245, 232),	//Touya//      12
-	vector<float, 3>(254, 239, 224),	//Tsukasa//    13
-	vector<float, 3>(255, 245, 232),	//Emu//        14
-	vector<float, 3>(255, 245, 232),	//Nene//       15
-	vector<float, 3>(255, 245, 232),	//Rui//        16
-	vector<float, 3>(255, 245, 232),	//Kanade//     17
-	vector<float, 3>(254, 239, 224),	//Mafuyu//     18
-	vector<float, 3>(255, 245, 232),	//Ena//        19
-	vector<float, 3>(255, 245, 232),	//Mizuki//     20
-	vector<float, 3>(253, 245, 235),	//Vocaloids//  21
+// default skin colors, I have literally no idea as to why this needs to be static
+const static vector<float, 4> DefaultSkinColor[21] = {
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Ichika//     1
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Saki//       2
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Honami//     3
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Shiho//      4
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//Minori//     5
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Haruka//     6
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//Airi//       7
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Shizuku//    8
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Kohane//     9
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//An//         10
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//Akito//      11
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Touya//      12
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//Tsukasa//    13
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Emu//        14
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Nene//       15
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Rui//        16
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Kanade//     17
+	vector<float, 4>(0.996, 0.937, 0.878, 1.0),				//Mafuyu//     18
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Ena//        19
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0),	//Mizuki//     20
+	vector<float, 4>(0.9921875, 0.9609375, 0.921875, 1.0)	//Vocaloids//  21
 };
 
-// shaded skin colors, I have literally no idea as to why this needs to be static
-const static vector<float, 3> SkinShade_Color[21] = {
-	vector<float, 3>(244, 182, 205),	//Ichika//     1
-	vector<float, 3>(244, 182, 205),	//Saki//       2
-	vector<float, 3>(244, 182, 205),	//Honami//     3
-	vector<float, 3>(244, 182, 205),	//Shiho//      4
-	vector<float, 3>(239, 175, 187),	//Minori//     5
-	vector<float, 3>(244, 182, 205),	//Haruka//     6
-	vector<float, 3>(239, 175, 187),	//Airi//       7
-	vector<float, 3>(244, 182, 205),	//Shizuku//    8
-	vector<float, 3>(244, 182, 205),	//Kohane//     9
-	vector<float, 3>(239, 175, 187),	//An//         10
-	vector<float, 3>(236, 169, 170),	//Akito//      11
-	vector<float, 3>(244, 182, 188),	//Touya//      12
-	vector<float, 3>(236, 169, 170),	//Tsukasa//    13
-	vector<float, 3>(244, 182, 205),	//Emu//        14
-	vector<float, 3>(244, 182, 205),	//Nene//       15
-	vector<float, 3>(244, 182, 188),	//Rui//        16
-	vector<float, 3>(244, 182, 205),	//Kanade//     17
-	vector<float, 3>(239, 175, 187),	//Mafuyu//     18
-	vector<float, 3>(244, 182, 205),	//Ena//        19
-	vector<float, 3>(244, 182, 205),	//Mizuki//     20
-	vector<float, 3>(227, 196, 203),	//Vocaloids//  21
+// shadow 1 skin colors, I have literally no idea as to why this needs to be static
+const static vector<float, 4> Shadow1SkinColor[21] = {
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Ichika//     1
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Saki//       2
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Honami//     3
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Shiho//      4
+	vector<float, 4>(0.937, 0.686, 0.733, 1.0),				//Minori//     5
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Haruka//     6
+	vector<float, 4>(0.937, 0.686, 0.733, 1.0),				//Airi//       7
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Shizuku//    8
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Kohane//     9
+	vector<float, 4>(0.937, 0.686, 0.733, 1.0),				//An//         10
+	vector<float, 4>(0.925, 0.663, 0.667, 1.0),				//Akito//      11
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Touya//      12
+	vector<float, 4>(0.925, 0.663, 0.667, 1.0),				//Tsukasa//    13
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Emu//        14
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Nene//       15
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Rui//        16
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Kanade//     17
+	vector<float, 4>(0.937, 0.686, 0.733, 1.0),				//Mafuyu//     18
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Ena//        19
+	vector<float, 4>(0.957, 0.714, 0.804, 1.0),				//Mizuki//     20
+	vector<float, 4>(0.890625, 0.7695313, 0.796875, 1.0)	//Vocaloids//  21
+};
+
+// shadow 2 skin colors, I have literally no idea as to why this needs to be static
+const static vector<float, 4> Shadow2SkinColor[21] = {
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Ichika//     1
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Saki//       2
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Honami//     3
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Shiho//      4
+	vector<float, 4>(0.878, 0.471, 0.537, 1.0),	//Minori//     5
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Haruka//     6
+	vector<float, 4>(0.878, 0.471, 0.537, 1.0),	//Airi//       7
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Shizuku//    8
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Kohane//     9
+	vector<float, 4>(0.878, 0.471, 0.537, 1.0),	//An//         10
+	vector<float, 4>(0.855, 0.439, 0.443, 1.0),	//Akito//      11
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Touya//      12
+	vector<float, 4>(0.855, 0.439, 0.443, 1.0),	//Tsukasa//    13
+	vector<float, 4>(0.914, 0.51, 0.545, 1.0),	//Emu//        14
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Nene//       15
+	vector<float, 4>(0.914, 0.51, 0.545, 1.0),	//Rui//        16
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Kanade//     17
+	vector<float, 4>(0.878, 0.471, 0.537, 1.0),	//Mafuyu//     18
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Ena//        19
+	vector<float, 4>(0.914, 0.51, 0.647, 1.0),	//Mizuki//     20
+	vector<float, 4>(0.796875, 0.59375, 0.6367188, 1.0)		//Vocaloids//  21
 };
 
 //------------------------------------------------------------------------------- 

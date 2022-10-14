@@ -8,7 +8,7 @@ vsOut vert(vsIn i){
     o.normalOS = i.normal;
     o.tangent = i.tangent;
     o.vertexOS = i.vertex;
-    o.uv = i.uv;
+    o.uv = (_ToggleLongTex != 0) ? vector<float, 2>(i.uv.x * 0.5, i.uv.y) : i.uv; // vs_TEXCOORD1
     o.vertexcol.x = i.vertexcol.x; // outline direction, EdgeScale_view @ line 246
     o.vertexcol.y = i.vertexcol.y; // rim intensity, RimScale_view @ line 247
     o.vertexcol.z = i.vertexcol.z; // eyebrow mask, used for making them appear in front of the hair at all times
@@ -38,7 +38,7 @@ vsOut vert(vsIn i){
         vector<half, 4> scale;
         scale = _OutlineWidth * _OutlineCorrectionWidth;
         fovScale *= scale.x;
-        fovScale *= 50.0;
+        fovScale *= 4000.0;
         fovScale *= 0.414250195;
         // base outline thickness
         fovScale *= o.vertexcol.x;
@@ -91,7 +91,7 @@ vsOut vert(vsIn i){
 vector<float, 4> frag(vsOut i) : SV_Target{
     /* TEXTURE CREATION */
 
-    const vector<fixed, 4> diffuseTex = _DiffuseTex.Sample(sampler_DiffuseTex, i.uv);
+    const vector<fixed, 4> mainTex = _MainTex.Sample(sampler_MainTex, i.uv);
 
     /* END OF TEXTURE CREATION */
 
@@ -105,7 +105,7 @@ vector<float, 4> frag(vsOut i) : SV_Target{
 
     /* COLOR CREATION */
 
-    vector<fixed, 4> finalColor = diffuseTex * 0.375;
+    vector<fixed, 4> finalColor = mainTex * 0.375;
 
     // apply environment lighting
     finalColor.xyz = lerp(finalColor.xyz, (blendColorBurn(finalColor.xyz, 
