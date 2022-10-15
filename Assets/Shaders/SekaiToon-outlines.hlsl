@@ -14,7 +14,7 @@ vsOut vert(vsIn i){
     o.vertexcol.z = i.vertexcol.z; // eyebrow mask, used for making them appear in front of the hair at all times
     o.vertexcol.w = i.vertexcol.w; // UNUSED
 
-    const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertex)); // transform to world space
+    const vector<half, 4> vertexWS = mul(UNITY_MATRIX_M, i.vertex); // transform to world space
 
     if(_OutlineType != 0){
         const half _OutlineCorrectionWidth = 2.25;

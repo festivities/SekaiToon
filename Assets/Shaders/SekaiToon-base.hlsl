@@ -14,7 +14,7 @@ vsOut vert(vsIn i){
     o.vertexcol.z = i.vertexcol.z; // eyebrow mask, used for making them appear in front of the hair at all times
     o.vertexcol.w = i.vertexcol.w; // UNUSED
 
-    const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertex)); // transform to world space
+    const vector<half, 4> vertexWS = mul(UNITY_MATRIX_M, i.vertex); // transform to world space
     const vector<half, 3> viewDirOS = normalize(ObjSpaceViewDir(o.vertexOS));
 
     vector<half, 4> zOffset = 1.0;
@@ -40,7 +40,7 @@ vsOut vert(vsIn i){
 
 vector<float, 4> frag(vsOut i) : SV_Target{
     const vector<half, 3> normalWS = UnityObjectToWorldNormal(i.normalOS);
-    const vector<half, 4> vertexWS = normalize(mul(UNITY_MATRIX_M, i.vertexOS));
+    const vector<half, 4> vertexWS = mul(UNITY_MATRIX_M, i.vertexOS);
     const vector<half, 3> viewDirWS = normalize(WorldSpaceViewDir(i.vertexOS)); // vs_TEXCOORD2?
 
 
